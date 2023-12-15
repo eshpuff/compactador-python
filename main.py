@@ -1,26 +1,49 @@
-with open('entrada.txt','r') as arq:
-    texto = arq.read()
+import os
 
-print(texto)
+def compactador(nomeArquivo):
+  arquivo = open('entrada.txt', 'r')
+  arquivoCompactado = open('entrada_compactada.txt', 'w')
+  arquivoLegenda = open('legenda.txt', 'w')
+  cont = 0
+  dic = {}
+  stringCompactada = ""
+  stringLegenda = ""
 
-lista = texto.split(' ')
-
-cont = 0
-dicionario = {}
-zipada = []
-txt_zipado = ''
-
-for item in lista:
-    if item not in dicionario:
-        dicionario[item] = str(cont)
-        txt_zipado += f' {item} : {dicionario[item]};\n'
+  for linha in arquivo:
+    linha = linha.split(" ")
+    for palavra in linha:
+      if palavra not in dic:
+        dic[palavra] = cont
         cont += 1
-    zipada.append(dicionario[item])
+      
+      palavra = str(dic[palavra])
+      stringCompactada += palavra + " "
 
-txt_zipado += '\n'
-txt_zipado += ' '.join(zipada)
-print(txt_zipado)
+  for key in dic:
+    stringLegenda += f'{key}:{dic[key]}\n'
 
-with open('saida_compactada.txt','w') as arq:
-    arq.write(txt_zipado)
+  arquivoCompactado.write(stringCompactada)
+  arquivoLegenda.write(stringLegenda)
 
+def descompactador(nomeArquivo):
+    with open('legenda.txt', 'r') as arquivoLegenda:
+        dicionario = {}
+        for item in arquivoLegenda:
+            item = item.replace('\n', '')
+            item = item.split(":")
+            dicionario[item[1]] = item[0]
+
+    with open(f'{nomeArquivo}.txt', 'r') as arquivoEntrada:
+        txt = ''
+        for linha in arquivoEntrada:
+            itens = linha.split()
+            for palavra in itens:
+                if palavra in dicionario:
+                    palavra = dicionario[palavra]
+                    txt += palavra + ' '
+
+    with open('saida_descompactada.txt', 'w') as arquivoSaidaDescompactado:
+        arquivoSaidaDescompactado.write(txt)
+
+compactador("entrada")
+descompactador("entrada_compactada")
